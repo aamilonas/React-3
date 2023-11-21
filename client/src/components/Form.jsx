@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Display from "./Display";
+import DisplayList from "./DisplayList";
 
 const Form = (props) => {
   const initialForm = {
@@ -8,72 +9,100 @@ const Form = (props) => {
     fur: "",
   };
 
-  const errorData = {
-    nameError: "",
-    noseColorError: "",
-    furError: "",
-  };
+  const [reindeerList, setReindeerList] = useState([]);
 
   const [reindeer, setReindeer] = useState(initialForm);
 
-  const onSubmitHandler = (e) => {
-    e.preventDefault();
-    alert(
-      ` nice reindeer hes called ${reindeer.name} with a ${reindeer.noseColor} nose and ${reindeer.fur} fur`
-    );
+  const [errors, setErrors] = useState([]);
+
+  const onChangeHandler = (e) => {
+    setReindeer({ ...reindeer, [e.target.name]: e.target.value });
   };
 
-  const formDataHandler = (e) => {};
+  const onSubmitHandler = (e) => {
+    e.preventDefault();
+
+    const errorList = [];
+
+    if (reindeer.name.length < 3) {
+      errorList.push("Name must be at least 3 characters");
+    }
+    if (reindeer.noseColor.length < 3) {
+      errorList.push("Nose color must be at least 3 characters");
+    }
+    if (reindeer.fur.length < 3) {
+      errorList.push("Fur must be at least 3 characters");
+    }
+
+    if (errorList.length > 0) {
+      setErrors(errorList);
+    } else {
+      setReindeerList([...reindeerList, reindeer]);
+      setReindeer(initialForm);
+    }
+  };
 
   return (
     <>
-      <form onSubmit={onSubmitHandler}>
-        <div class="mb-3">
-          <label for="exampleInputEmail1" class="form-label">
-            Name
-          </label>
-          <input
-            type="text"
-            class="form-control"
-            id="exampleInputEmail1"
-            value={reindeer.name}
-            onChange={(e) => setReindeer({ ...reindeer, name: e.target.value })}
-          />
-          <div id="emailHelp" class="form-text"></div>
-        </div>
-        <div class="mb-3">
-          <label for="exampleInputPassword1" class="form-label">
-            Nose Color
-          </label>
-          <input
-            type="text"
-            class="form-control"
-            id="exampleInputPassword1"
-            onChange={(e) =>
-              setReindeer({ ...reindeer, noseColor: e.target.value })
-            }
-          />
-        </div>
-        <div class="mb-3 form-check">
-          <label class="form-control" for="exampleCheck1">
-            Fur
-          </label>
-          <input
-            type="text"
-            class="form-contol"
-            id="exampleCheck1"
-            onChange={(e) => setReindeer({ ...reindeer, fur: e.target.value })}
-          />
-        </div>
-        <button type="submit" class="btn btn-primary">
-          Submit
-        </button>
-      </form>
-      <Display
-        name={reindeer.name}
-        color={reindeer.noseColor}
-        fur={reindeer.fur}
-      />
+      <div className="container d-flex justify-content-center flex-column">
+        <form onSubmit={onSubmitHandler}>
+          {errors.map((err, i) => (
+            <p key={i}>{err}</p>
+          ))}
+          <div className="col-5">
+            <div class="mb-3">
+              <label for="exampleInputEmail1" class="form-label">
+                Name
+              </label>
+              <input
+                name="name"
+                type="text"
+                class="form-control"
+                id="exampleInputEmail1"
+                value={reindeer.name}
+                onChange={onChangeHandler}
+              />
+            </div>
+            <div class="mb-3">
+              <label for="exampleInputPassword1" class="form-label">
+                Nose Color
+              </label>
+              <input
+                name="noseColor"
+                type="text"
+                class="form-control"
+                id="exampleInputPassword1"
+                value={reindeer.noseColor}
+                onChange={onChangeHandler}
+              />
+            </div>
+            <div class="mb-3 form-check">
+              <label for="exampleCheck1" class="form-check-label">
+                Fur
+              </label>
+              <input
+                name="fur"
+                type="text"
+                class="form-contol"
+                id="exampleCheck1"
+                value={reindeer.fur}
+                onChange={onChangeHandler}
+              />
+            </div>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary">
+              Submit
+            </button>
+          </div>
+        </form>
+        <Display
+          name={reindeer.name}
+          color={reindeer.noseColor}
+          fur={reindeer.fur}
+        />
+        <DisplayList list={reindeerList} />
+      </div>
     </>
   );
 };
